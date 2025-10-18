@@ -1,10 +1,4 @@
-/**
-* Template Name: Style
-* Template URL: https://bootstrapmade.com/style-bootstrap-portfolio-template/
-* Updated: Jul 02 2025 with Bootstrap v5.3.7
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
+
 
 (function() {
   "use strict";
@@ -240,4 +234,114 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+  /**
+   * Contact form -> redirect to WhatsApp with prefilled message
+   * When the user submits the contact form, build a message containing
+   * name, email, subject and message and open WhatsApp (web or app) to send
+   * to +91 99472 41065. This prevents the default form POST.
+   */
+  (function initWhatsAppContactRedirect() {
+    const form = document.getElementById('contact-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // grab values
+      const name = (form.querySelector('[name="name"]') || {}).value || '';
+      const email = (form.querySelector('[name="email"]') || {}).value || '';
+      const subject = (form.querySelector('[name="subject"]') || {}).value || '';
+      const message = (form.querySelector('[name="message"]') || {}).value || '';
+
+      // Basic validation: require name and message
+      if (!name.trim() || !message.trim()) {
+        // show a simple inline error if available
+        const errorEl = form.querySelector('.error-message');
+        if (errorEl) {
+          errorEl.textContent = 'Please provide your name and message before sending.';
+        } else {
+          alert('Please provide your name and message before sending.');
+        }
+        return;
+      }
+
+      const phone = '919947241065'; // WhatsApp number in international format without + or leading zeros
+
+      // Build the message. Keep it friendly and readable.
+      let waMessage = `Hi! I contacted you via the website.%0A%0A`;
+      waMessage += `Name: ${encodeURIComponent(name)}%0A`;
+      if (email.trim()) waMessage += `Email: ${encodeURIComponent(email)}%0A`;
+      if (subject.trim()) waMessage += `Subject: ${encodeURIComponent(subject)}%0A`;
+      waMessage += `%0AMessage:%0A${encodeURIComponent(message)}%0A`;
+
+      // WhatsApp web URL
+      const waUrl = `https://wa.me/${phone}?text=${waMessage}`;
+
+      // Try to open in a new tab/window
+      // Push a generic analytics event (no PII) if dataLayer exists
+      try {
+        if (window.dataLayer && typeof window.dataLayer.push === 'function') {
+          window.dataLayer.push({
+            event: 'contact_submit',
+            method: 'whatsapp',
+            subject: subject || '(no-subject)'
+          });
+        }
+      } catch (err) {
+        // swallow analytics errors
+      }
+      window.open(waUrl, '_blank');
+
+      // Optionally, show the sent-message UI element (so the user sees feedback)
+      const sentEl = form.querySelector('.sent-message');
+      if (sentEl) {
+        sentEl.style.display = 'block';
+      }
+    });
+  })();
+
+  // Track clicks on any .whatsapp links site-wide
+  (function trackWhatsAppLinks() {
+    document.querySelectorAll('a.whatsapp').forEach(a => {
+      a.addEventListener('click', function() {
+        try {
+          if (window.dataLayer && typeof window.dataLayer.push === 'function') {
+            window.dataLayer.push({ event: 'whatsapp_click' });
+          }
+        } catch (err) {}
+      });
+    });
+  })();
+
+  /**
+   * Lazy-load polyfill for images using data-src/data-srcset when native loading isn't available
+   */
+  (function initLazyImagePolyfill() {
+    if ('loading' in HTMLImageElement.prototype) return; // browser supports native lazy
+
+    const lazyImages = document.querySelectorAll('img[data-src], img[data-srcset]');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            if (img.dataset.src) img.src = img.dataset.src;
+            if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+            img.removeAttribute('data-src');
+            img.removeAttribute('data-srcset');
+            obs.unobserve(img);
+          }
+        });
+      });
+      lazyImages.forEach(img => io.observe(img));
+    } else {
+      // Fallback: just load images immediately
+      lazyImages.forEach(img => {
+        if (img.dataset.src) img.src = img.dataset.src;
+        if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+        img.removeAttribute('data-src');
+        img.removeAttribute('data-srcset');
+      });
+    }
+  })();
 })();

@@ -1,0 +1,4 @@
+# Example redirects - add any API endpoints or pretty links here
+# Format: <from> <to> <status>
+
+/*    /index.html   200

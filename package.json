@@ -1,0 +1,19 @@
+{
+  "name": "venusco-site-tools",
+  "version": "1.0.0",
+  "description": "Utility scripts for VenusCo static site (sitemap generator)",
+  "main": "scripts/generate-sitemap.js",
+  "scripts": {
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "build": "node scripts/build-assets.js && node scripts/generate-sitemap.js"
+  },
+  "author": "VenusCo",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^10.3.3",
+    "xmlbuilder2": "^4.2.1",
+    "sharp": "^0.32.4",
+    "terser": "^5.19.2",
+    "csso": "^5.0.5"
+  }
+}

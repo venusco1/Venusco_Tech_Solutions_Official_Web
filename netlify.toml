@@ -1,0 +1,12 @@
+[build]
+  command = "npm install && npm run build"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Set SITE_URL and GA_ID in Netlify UI for production
+  # SITE_URL = "https://venusco.in"
+  # GA_ID = "G-XXXXXXXXXX"
+
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
